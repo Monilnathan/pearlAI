@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import os
 import re  
 import math
+from nlp_processor import perform_nlp 
 
 app = Flask(__name__)
 
@@ -33,6 +34,8 @@ def generate_response(query):
         return "My developer is Monil Nathan Wamala, a skilled software engineer based in Uganda."
     elif 'who is your father' in query:
         return "My creator and developer is Monil Nathan Wamala."
+    elif 'who are you' in query:
+        return "Am an AI Assitant. My name is Pearl Bot, inspired that my developer MONIL NATHAN is a Ugandan and Uganda is the Pearl of Africa."
     elif 'what is your name' in query:
         return "My name is Pearl Bot, inspired that my developer MONIL NATHAN is a Ugandan and Uganda is the Pearl of Africa."
     elif 'your name' in query:
@@ -40,26 +43,31 @@ def generate_response(query):
     elif 'who is tina' in query:
         return "Tina is beautiful angel that fell from heaven."
     elif 'how old are you' in query:
-        start_date = datetime(2024, 4, 25, 9, 43)  
+        start_date = datetime(2024, 4, 25, 9, 43)
         current_date = datetime.now()
         age = current_date - start_date
         days = age.days
         minutes = age.seconds // 60
         return f"I am {days} days and {minutes} minutes old."
-    elif any(op in query for op in ['+', '-', '*', '/']): 
+    elif any(op in query for op in ['+', '-', '*', '/']):
         return calculate(query)
     elif 'are you human' in query or 'are you a human' in query:
         return "No, I am not a human. I am an AI chatbot."
     elif 'location' in query or 'personal data' in query or 'privacy' in query:
         return "I don't have access to your location or any personal data unless you explicitly provide it to me in our conversation. Your privacy and security are important, so I don't retain any personal information about users. How can I assist you today?"
     else:
-        search_results = google_search(query)
-        if search_results and is_straight_answer(search_results):
-            return make_links_clickable(search_results)
-        elif search_results:
-            return "-" + make_links_clickable(search_results)
+        tokens, pos_tags, entities = perform_nlp(query)  # Perform NLP processing
+        if 'PERSON' in [ent[1] for ent in entities]:
+            return "It seems like you're asking about a person. Let me find more information for you."
         else:
-            return "Sorry, I couldn't find any relevant information for your query."
+            search_results = google_search(query)
+            if search_results and is_straight_answer(search_results):
+                return make_links_clickable(search_results)
+            elif search_results:
+                return "-" + make_links_clickable(search_results)
+            else:
+                return "Sorry, I couldn't find any relevant information for your query."
+
 
 
 
