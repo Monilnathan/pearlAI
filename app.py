@@ -10,6 +10,9 @@ from nlp_processor import perform_nlp
 app = Flask(__name__)
 
 EXPLICIT_WORDS = ['pornography', 'adult content', 'explicit', 'xxx', 'porn', 'nsfw', 'sex', 'nude', 'xxx-rated', 'erotic', 'vulgar', 'obscene', 'naked', 'sexual', 'fetish', 'kinky', 'lust', 'seduce', 'orgasm', 'bikini', 'striptease', 'sensual', 'dirty', 'intimate', 'pleasure', 's&m', 'kama sutra', 'dirty talk', 'playboy']
+
+
+
 AI_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'AI')
 
 @app.route('/')
@@ -23,11 +26,18 @@ def search():
     return jsonify({'response': response})
 
 def generate_response(query):
+   
+    greetings = ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening']
+   
     if any(explicit_word in query for explicit_word in EXPLICIT_WORDS):
         return "I'm sorry, I can't respond to that."
+    
+    if any(greeting in query for greeting in greetings):
+        return "Hello! How can I assist you today?"
+    
+    
     if 'ampire technologies' in query:
         return "Ampire Technologies is a technological company based and headquartered in Uganda-Kampala located in Katwe Solar House, Level 3. I am one of their products."
-
     if 'who made you' in query:
         return "I was created by Monil Nathan Wamala, a developer and software engineer in Uganda. He is the CEO of Ampire Technologies Uganda Ltd, the managing director of Monat Media Uganda, and the manager of NAN Cleaning and Fumigation Services."
     elif 'who are your developers' in query:
@@ -38,6 +48,7 @@ def generate_response(query):
         return "Am an AI Assitant. My name is Pearl Bot, inspired that my developer MONIL NATHAN is a Ugandan and Uganda is the Pearl of Africa."
     elif 'what is your name' in query:
         return "My name is Pearl Bot, inspired that my developer MONIL NATHAN is a Ugandan and Uganda is the Pearl of Africa."
+    
     elif 'your name' in query:
         return "My name is Pearl Bot, inspired by Uganda, known as the Pearl of Africa."
     elif 'who is tina' in query:
@@ -56,7 +67,7 @@ def generate_response(query):
     elif 'location' in query or 'personal data' in query or 'privacy' in query:
         return "I don't have access to your location or any personal data unless you explicitly provide it to me in our conversation. Your privacy and security are important, so I don't retain any personal information about users. How can I assist you today?"
     else:
-        tokens, pos_tags, entities = perform_nlp(query)  # Perform NLP processing
+        tokens, pos_tags, entities = perform_nlp(query)  
         if 'PERSON' in [ent[1] for ent in entities]:
             return "It seems like you're asking about a person. Let me find more information for you."
         else:
@@ -67,6 +78,8 @@ def generate_response(query):
                 return "-" + make_links_clickable(search_results)
             else:
                 return "Sorry, I couldn't find any relevant information for your query."
+
+
 
 
 
